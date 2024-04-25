@@ -1,0 +1,31 @@
+base = 'name' #or id
+allowed_formats = ['.jpg','.webp','.jpeg',]
+is_allowed = False
+product = []
+
+
+if record.folder_id.id == 36:
+    #check name of the file
+    lowername = record.name.lower()
+    for form in allowed_formats:
+        length = lowername.rfind(form)
+        if length > 0:
+            is_allowed = True
+            name = lowername[:length]
+            #raise UserError(name)
+    if is_allowed:
+        if base == 'name':
+            product = env['product.template'].search([('name','ilike',name)],limit=1)
+        elif base =='id':
+            product = env['product.template'].search([('id','=',name)],limit=1)
+        #raise UserError(product)
+        if product:
+            
+            product.write({
+                'image_1920':record.datas
+            })
+    #find 
+    #raise UserError('test')
+    
+    #Add to the base 64
+
