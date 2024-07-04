@@ -1,0 +1,20 @@
+#Hardcoded info
+    #reward_i_want_to_apply is the item in my loyalty that I want to auto apply
+    #name_of_coupon is the coupon code I want to use
+reward_i_want_to_apply = 2
+name_of_coupon = "aaaaa"
+
+record._try_apply_code(name_of_coupon)
+selected_reward_id = env['loyalty.reward'].browse(reward_i_want_to_apply)
+
+
+claimable_rewards = record._get_claimable_rewards()
+selected_coupon = False
+for coupon, rewards in claimable_rewards.items():
+    if selected_reward_id in rewards:
+        selected_coupon = coupon
+        break
+if not selected_coupon:
+    raise UserError("coupon not found")
+record._apply_program_reward(selected_reward_id, coupon)
+record._update_programs_and_rewards()
