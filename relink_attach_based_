@@ -1,0 +1,39 @@
+attach = env['ir.attachment']
+
+for rec in records:
+    #trouver le document lié
+    att = attach.search([('name','=',rec.name),('x_studio_rewrite','=',False)],limit=1)
+    
+    #le nom de l'attachment doit être une clé pour trouver le SO ou la facture ou le partner
+    old_values = json2.get(att.name,False)
+    res_id = False
+    #raise UserError(old_values)
+    if att and old_values:
+        #raise UserError(att.res_model)
+        res_model = old_values.get('res_model',False)
+        old_name = old_values.get('name',False)
+        newname = old_values.get('filename',False)
+        #raise UserError(res_model)
+        if res_model == False or old_name == False or newname == False:
+            continue
+        
+        if res_model == "account.move":
+            res_id = env[res_model].search([('name','ilike',old_name[:13])],limit=1).id
+        elif res_model == "sale.order":
+            res_id = env[res_model].search([('name','=',old_name[:6])],limit=1).id
+        else:
+            res_id = env[res_model].search([('name','=',old_name)],limit=1).id
+        
+    if res_id:
+        att.write({
+            'x_studio_rewrite':True, #need this to be sure we don't write twice
+            'res_model':res_model,
+            'res_id':res_id, #le plus compliqué
+            'name':old_name,
+        })
+    
+        #le nom de l'attachment doit être une clé pour trouver le SO ou la facture ou le partner
+        #donc faire une recherche
+    #change of name
+    #change res_model
+    #change res_id -> trouvé sur base de la recherche de nom, qui n'a pas changé pour les factures ou pour les SO
