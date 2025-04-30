@@ -1,0 +1,15 @@
+portal_wizard_model = env['portal.wizard.user']
+
+for partner in records:
+  if not partner.email:
+    raise Warning(f"The {partner.name} contact doesn't have an email address.")
+
+  #add new portal user line in wizard
+  wizard_user = portal_wizard_model.create({
+    'wizard_id': env['portal.wizard'].create({}).id, # Crée un assistant temporaire
+    'partner_id': partner.id,
+    'email': partner.email,
+  })
+  
+  #grant portal access
+  wizard_user.action_grant_access()
