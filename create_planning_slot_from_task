@@ -1,0 +1,42 @@
+##Creating a planning.slot when we create a task
+## need to create a x_studio_slot field on the task first, referencing to planning.slot model
+
+slot = env['planning.slot']
+emp = env['hr.employee']
+role = env['planning.role']
+res = env['resource.resource']
+
+##CREATE
+if not record.x_studio_slot and record.user_ids:
+    res_id = res.search([('user_id','=',record.user_ids[0].id)])
+    role_id = False
+    if res_id and len(res_id.role_ids) == 1:
+        role_id = res_id.role_ids[0].id
+    #raise UserError(role_id)
+    new_slot = slot.create({
+        'name': record.name+' for '+record.user_ids[0].name,
+        'project_id': record.project_id.id,
+        'sale_line_id':record.sale_line_id.id,
+        'start_datetime': record.planned_date_begin or False,
+        'end_datetime': record.date_deadline or False,
+        'role_id': role_id,
+        'resource_id':res_id.id,
+    })
+    record.write({
+        'x_studio_slot': new_slot.id,
+    })
+else:
+    res_id = res.search([('user_id','=',record.user_ids[0].id)])
+    role_id = False
+    if res_id and len(res_id.role_ids) == 1:
+        role_id = res_id.role_ids[0].id
+    #raise UserError(role_id)
+    record.x_studio_slot.write({
+        'name': record.name+' for '+record.user_ids[0].name,
+        'project_id': record.project_id.id,
+        'sale_line_id':record.sale_line_id.id,
+        'start_datetime': record.planned_date_begin or False,
+        'end_datetime': record.date_deadline or False,
+        'role_id': role_id,
+        'resource_id':res_id.id,
+    })
