@@ -1,0 +1,9 @@
+for rec in records:
+    rec.code_mapping_ids.filtered(lambda r: r.code == False).write({
+        'code':rec.code
+    })
+#2 passes otherwise error
+for rec in records:
+    rec.write({
+        'company_ids':[Command.link(2),Command.link(3)],
+    })
